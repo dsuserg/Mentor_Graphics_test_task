@@ -1,0 +1,24 @@
+#include"rule_dir_exist.h"
+#include"regex"
+using namespace std;
+using namespace filesystem;
+using namespace parser;
+
+//Rule_dir_coexist::Rule_dir_coexist(initializer_list<regex> names){
+//    for(regex name: names){
+//    }
+//}
+
+Rule_dir_coexist::Rule_dir_coexist(initializer_list<regex>names){
+    for (regex name: names){
+        this->d_set.insert(name);
+    }
+}
+
+bool Rule_dir_coexist::start_enforcement(path pth){
+    for(regex& r: t ){
+        
+    }
+    return 0;
+}
+
