@@ -1,0 +1,4 @@
+#ifndef RULE_SAME_FILE_SET_H
+#define RULE_SAME_FILE_SET_H
+
+#endif // RULE_SAME_FILE_SET_H
