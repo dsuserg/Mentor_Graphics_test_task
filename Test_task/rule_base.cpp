@@ -4,10 +4,11 @@ using namespace std;
 using namespace parser_impl;
 
 bool Rule_base::is_errors(){
-    return this->erors;
+    return this->errors;
 }
 
-std::string Rule_base::get_info(){
+string Rule_base::get_info(){
     return this->info;
 }
+
 

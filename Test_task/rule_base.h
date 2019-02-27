@@ -5,13 +5,14 @@
 
 namespace parser_impl {
 using namespace parser;
+
 class Rule_base:public Rule{
 public:
     bool is_errors() override;
     std::string get_info() override;
-private:
-    bool erors;
+protected:
     std::string info;
+    bool errors{0};
 };
 
 }
