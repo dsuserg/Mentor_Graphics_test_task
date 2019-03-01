@@ -2,7 +2,8 @@
 
 using namespace std;
 
-set<string> recursive_search(filesystem::path pth, regex pattern){
+set<string> parser::functions::recursive_search_names(filesystem::path pth, regex pattern){
+
     set<string> s;
 
     for(auto &it: filesystem::recursive_directory_iterator(pth)){
@@ -14,3 +15,17 @@ set<string> recursive_search(filesystem::path pth, regex pattern){
 
     return s;
 }
+
+set<filesystem::path> parser::functions::recursive_search_paths(filesystem::path pth, regex pattern){
+
+    set<filesystem::path> s;
+
+    for(auto &it: filesystem::recursive_directory_iterator(pth)){
+        if(regex_search(it.path().string(),pattern)){
+            s.insert(it.path());
+        }
+    }
+
+    return s;
+}
+

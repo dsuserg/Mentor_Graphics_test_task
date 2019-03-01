@@ -5,8 +5,15 @@
 #include <set>
 #include <filesystem>
 
-std::set<std::string> recursive_search(std::filesystem::path, std::regex);
+
+namespace  parser{
+    namespace functions {
+
+    std::set<std::string> recursive_search_names(std::filesystem::path, std::regex);
+    std::set<std::filesystem::path> recursive_search_paths(std::filesystem::path, std::regex);
 
 
+    }
+}
 
 #endif // FUNCTIONS_H

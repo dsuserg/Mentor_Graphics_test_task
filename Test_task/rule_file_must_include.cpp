@@ -1,19 +1,18 @@
-#include<rule_file_must_contain.h>
+#include<rule_file_must_include.h>
 #include<fstream>
 
 using namespace std;
 using namespace parser;
 
-Rule_file_must_contain::Rule_file_must_contain(string pattern){
+Rule_file_must_include::Rule_file_must_include(string pattern){
     this->pattern = pattern;
 }
 
-Rule_file_must_contain::Rule_file_must_contain(string pattern, regex::flag_type flag){
-    Rule_file_must_contain{pattern};
+Rule_file_must_include::Rule_file_must_include(string pattern, regex::flag_type flag):Rule_file_must_include{pattern} {
     this->flag = flag;
 }
 
-bool Rule_file_must_contain::start_enforcement(filesystem::path pth){
+bool Rule_file_must_include::start_enforcement(filesystem::path pth){
     ifstream file{pth};
     regex re{this->pattern,this->flag};
     bool found = 0;

@@ -6,14 +6,14 @@
 
 namespace parser {
 
-class Rule_file_must_contain: public parser_impl::Rule_base{
+class Rule_file_must_include: public parser_impl::Rule_base{
 public:
-    Rule_file_must_contain(std::string);
-    Rule_file_must_contain(std::string, std::regex::flag_type);
+    Rule_file_must_include(std::string);
+    Rule_file_must_include(std::string, std::regex::flag_type);
     bool start_enforcement(std::filesystem::path) override;
-private:
+protected:
     std::string pattern;
-    std::regex::flag_type flag{std::regex_constants::ECMAScript};
+    std::regex::flag_type flag;
 };
 
 }

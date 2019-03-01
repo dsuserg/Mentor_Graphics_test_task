@@ -15,8 +15,8 @@ Rule_same_file_set::Rule_same_file_set(string dir1, string dir2, regex pattern){
 
 bool Rule_same_file_set::start_enforcement(filesystem::path pth){
 
-    set<string> dir1 {recursive_search(pth.string()+"/"+this->dir1, this->pattern)};
-    set<string> dir2 {recursive_search(pth.string()+"/"+this->dir2, this->pattern)};
+    set<string> dir1 {functions::recursive_search_names(pth.string()+"/"+this->dir1, this->pattern)};
+    set<string> dir2 {functions::recursive_search_names(pth.string()+"/"+this->dir2, this->pattern)};
     set<string> d1_d2;
     set<string> d2_d1;
 
