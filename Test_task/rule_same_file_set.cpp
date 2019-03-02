@@ -30,26 +30,38 @@ bool Rule_same_file_set::start_enforcement(filesystem::path pth){
 
     else {
         if(d1_d2.empty()){
+            this->info += "In " + this->dir1 + " there are missing files present in " + this->dir2 +":";
             for(const string& it: d2_d1){
-                this->info += " " + it + ",";
+                this->info += " '" + it + "',";
             }
+
+            this->info.pop_back();
         }
 
         else if(d2_d1.empty()) {
+            this->info += "In " + this->dir1 + " there are extra files files not present " + this->dir2 +":";
             for(const string& it: d1_d2){
-                this->info += " " + it + ",";
+                this->info += " '" + it + "',";
             }
+            this->info.pop_back();
         }
 
         else{
+            this->info += "In " + this->dir1 + " there are missing files present in " + this->dir2 +":";
             for(const string& it: d2_d1){
-                this->info += " " + it + ",";
+                this->info += " '" + it + "',";
             }
+            this->info.pop_back();
+
+            this->info += "\nIn " + this->dir1 + " there are extra files files not present " + this->dir2 +":";
+
             for(const string& it: d1_d2){
-                this->info += " " + it + ",";
+                this->info += " '" + it + "',";
             }
 
+            this->info.pop_back();
         }
+
         this->errors = 1;
         return 0;
     }

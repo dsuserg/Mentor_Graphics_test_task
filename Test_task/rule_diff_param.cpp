@@ -42,9 +42,10 @@ bool Rule_diff_param::start_enforcement(std::filesystem::path pth){
     float rel_diff = static_cast<float>(max(f1_max,f2_max))/min(f1_max,f2_max) - 1.0;
 
     this->errors = ( rel_diff > this->criterion);
+
     if(this->errors){
         stringstream fmt;
-        fmt << "(file1="<< to_string(f1_max) << ", " << "file2="<< to_string(f2_max) <<","<< "rel.diff="<< to_string(rel_diff) << ", " "criterion="<< to_string(this->criterion) <<")";
+        fmt << "(file1="<< f1_max << ", " << "file2="<< f2_max <<", "<< "rel.diff="<< round(rel_diff*100)/100 << ", " "criterion="<< this->criterion <<")";
         this->info = fmt.str();
     }
 
