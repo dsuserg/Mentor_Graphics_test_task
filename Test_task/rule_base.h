@@ -8,6 +8,8 @@ using namespace parser;
 
 class Rule_base:public Rule{
 public:
+    ~Rule_base() override = default;
+
     bool is_errors() override;
     std::string get_info() override;
 protected:

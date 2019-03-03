@@ -15,8 +15,8 @@ Rule_same_file_set::Rule_same_file_set(string dir1, string dir2, regex pattern){
 
 bool Rule_same_file_set::start_enforcement(filesystem::path pth){
 
-    set<string> dir1 {functions::recursive_search_names(pth.string()+"/"+this->dir1, this->pattern)};
-    set<string> dir2 {functions::recursive_search_names(pth.string()+"/"+this->dir2, this->pattern)};
+    set<string> dir1 {functions::recursive_search_names(pth.string()+filesystem::path::preferred_separator+this->dir1, this->pattern)};
+    set<string> dir2 {functions::recursive_search_names(pth.string()+filesystem::path::preferred_separator+this->dir2, this->pattern)};
     set<string> d1_d2;
     set<string> d2_d1;
 
@@ -39,7 +39,7 @@ bool Rule_same_file_set::start_enforcement(filesystem::path pth){
         }
 
         else if(d2_d1.empty()) {
-            this->info += "In " + this->dir1 + " there are extra files files not present " + this->dir2 +":";
+            this->info += "In " + this->dir1 + " there are extra files files not present in " + this->dir2 +":";
             for(const string& it: d1_d2){
                 this->info += " '" + it + "',";
             }
@@ -53,7 +53,7 @@ bool Rule_same_file_set::start_enforcement(filesystem::path pth){
             }
             this->info.pop_back();
 
-            this->info += "\nIn " + this->dir1 + " there are extra files files not present " + this->dir2 +":";
+            this->info += "\nIn " + this->dir1 + " there are extra files files not present in " + this->dir2 +":";
 
             for(const string& it: d1_d2){
                 this->info += " '" + it + "',";

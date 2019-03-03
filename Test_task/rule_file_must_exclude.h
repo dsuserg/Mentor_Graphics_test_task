@@ -7,6 +7,8 @@ namespace parser {
 class Rule_file_must_exclude: public Rule_file_must_include{
 public:
     using Rule_file_must_include::Rule_file_must_include;
+    ~Rule_file_must_exclude() override = default;
+
     bool start_enforcement(std::filesystem::path) override;
 };
 

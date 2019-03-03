@@ -10,8 +10,8 @@ namespace parser {
 class Rule_coexist: public parser_impl::Rule_base{
 public:
     Rule_coexist() = default;
-    Rule_coexist(std::string, std::function<bool(std::filesystem::path)>);
-    Rule_coexist(std::initializer_list<std::string>, std::function<bool(const std::filesystem::path&)>);
+    Rule_coexist(std::string file, std::function<bool(std::filesystem::path)> is_file_type);
+    Rule_coexist(std::initializer_list<std::string> file, std::function<bool(const std::filesystem::path&)> is_file_type);
     ~Rule_coexist() override = default;
 
     bool start_enforcement(std::filesystem::path) override;

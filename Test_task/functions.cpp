@@ -38,3 +38,4 @@ set<filesystem::path> parser::functions::set_of_paths(filesystem::path pth, rege
 
     return  s;
 }
+

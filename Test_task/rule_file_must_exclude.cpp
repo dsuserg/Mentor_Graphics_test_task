@@ -21,7 +21,7 @@ bool Rule_file_must_exclude::start_enforcement(filesystem::path pth){
     this->errors = found;
 
     if(this->errors){
-        this->info = "(" + to_string(counter) + ")" + ":" + buff;
+        this->info = "(" + to_string(counter) + ")" + ": " + buff;
     }
 
     return !found;

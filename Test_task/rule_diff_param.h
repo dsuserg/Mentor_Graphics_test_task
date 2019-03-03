@@ -7,10 +7,12 @@ namespace parser {
 
 class Rule_diff_param: public parser_impl::Rule_base{
 public:
-    Rule_diff_param(std::filesystem::path file1, std::filesystem::path file2, std::string param_name, float criterion);
+    Rule_diff_param(std::filesystem::path file1, std::filesystem::path file2, std::string param_name, double criterion);
+    ~Rule_diff_param() override = default;
+
     bool start_enforcement(std::filesystem::path) override;
 private:
-    float criterion;
+    double criterion;
     std::filesystem::path file1;
     std::filesystem::path file2;
     std::string param_name;

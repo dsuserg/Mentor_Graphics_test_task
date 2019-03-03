@@ -7,6 +7,8 @@ namespace parser_impl {
 using namespace parser;
 class Parser_base:public Parser{
 public:
+    ~Parser_base() override = default;
+
     void set_path(std::filesystem::path) override;
     std::filesystem::path get_path() override;
     std::list<Rule*>& list_of_rules() override;

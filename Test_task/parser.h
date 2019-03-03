@@ -10,6 +10,7 @@ namespace parser {
 class Parser{
 public:
     virtual ~Parser() = default;
+
     virtual bool parse() = 0;
     virtual void set_path(std::filesystem::path) = 0;
     virtual std::filesystem::path get_path() = 0;
