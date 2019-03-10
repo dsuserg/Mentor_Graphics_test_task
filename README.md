@@ -1,16 +1,9 @@
 # Mentor_Graphics_test_task
-For given task were designed two main abstractions <b>Parser</b> and <b>Rule</b>.<br>
-The main idea is that every unit of filesystem can be processed by user defined parser 
-with certain list of customizable rules.
+There are 2 namespaces with <b>test_functions</b> and <b>my_tests</b> respectively. <br>
 
-<b>Parser</b> is an interface class which declaring following methods: <br>
-<em>parse()</em> - the driver method does controlling execution of rules enforcement. <br>
-<em>set_path()</em> <br>
-<em>get_path()</em> <br>
-<em>list_of_rules()</em> - returns reference to list container for rules management. <br>
+Every processor functions returns <b>Status</b> structure containing information and success parameter.<br>
+<em>custom_test_run()</em> is the <em>custom_test()</em> proccessor, and it can output information in any preffered stream.<br>
 
-<b>Rule</b> is an interface class which declaring following methods:<br>
-<em>start_enforcement()</em> - implement processing of parsing unit. <br>
-<em>is_errors()</em> -  returns true if errors ocures during enforcement.<br>
-<em>get_info()</em> - returns info about errors. <br>
+For using:  ./test_task.exe path_to_log_dir
+
 
