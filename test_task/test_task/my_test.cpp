@@ -1,12 +1,14 @@
+#include "pch.h"
 #include "my_tests.h"
 
 test_functions::Status my_tests::custom_test(const std::filesystem::path &dir){
-    test_functions::Checker checker{};
+	char sep = dir.preferred_separator;
+	test_functions::Checker checker{};
     checker.push_include("Solver finished at");
     checker.push_exclude(std::regex{ "error", std::regex::icase });
 
-    std::string pth_ft_run { dir.string()+dir.preferred_separator+"ft_run" };
-    std::string pth_ft_reference { dir.string()+dir.preferred_separator+"ft_reference" };
+    std::string pth_ft_run { dir.string()+sep+"ft_run" };
+    std::string pth_ft_reference { dir.string()+sep+"ft_reference" };
 
     test_functions::Status s;
     s = test_functions::exist(pth_ft_run);
@@ -18,11 +20,11 @@ test_functions::Status my_tests::custom_test(const std::filesystem::path &dir){
 
     std::set<std::filesystem::path> files_of_ft_run{ test_functions::recursive_search_paths(pth_ft_run, std::regex{ "\\d+.\\d+\\.stdout" }) };
 
-    std::stringstream info_aggregator;
+	std::stringstream info_aggregator;
 
     for (const auto& path: files_of_ft_run) {
         test_functions::Status s{checker.check(path)};
-        if (!s.success) info_aggregator << path.lexically_relative(dir).native()
+        if (!s.success) info_aggregator << path.lexically_relative(dir).string()
                                         << s.info;
     }
 
@@ -45,11 +47,11 @@ test_functions::Status my_tests::custom_test(const std::filesystem::path &dir){
 
         s = test_functions::diff_param(f1, "ft_run", f2, "ft_reference", "Memory Working Set Peak", 4);
 
-        if (!s.success) info_aggregator << pth1->lexically_relative(dir).native()
+        if (!s.success) info_aggregator << pth1->lexically_relative(dir).string()
                                         << ": different 'Memory Working Set Peak' " << s.info;
 
         s = test_functions::diff_param(f1, "ft_run", f2, "ft_reference", "MESH::Bricks: Total", 0.1);
-        if (!s.success) info_aggregator << pth2->lexically_relative(dir).native()
+        if (!s.success) info_aggregator << pth2->lexically_relative(dir).string()
                                         << ": different 'Total' of bricks " << s.info;
 
     }
@@ -70,17 +72,17 @@ test_functions::Status my_tests::custom_test_run(const std::filesystem::path& di
     for (auto *stream: out_streams) {
         if(s.success){
             s.success = 1;
-            *stream << "OK: " << dir.parent_path().filename().native()
-                              << dir.preferred_separator
-                              << dir.filename().native()
-                              << std::filesystem::path::preferred_separator
+            *stream << "OK: " << dir.parent_path().filename().string()
+                              << char(dir.preferred_separator)
+                              << dir.filename().string()
+                              << char(dir.preferred_separator)
                               << std::endl;
         }
         else
-            *stream << "FAIL: " << dir.parent_path().filename().native()
-                                << dir.preferred_separator
-                                << dir.filename().native()
-                                << std::filesystem::path::preferred_separator
+            *stream << "FAIL: " << dir.parent_path().filename().string()
+                                << char(dir.preferred_separator)
+                                << dir.filename().string()
+                                << char(dir.preferred_separator)
                                 << std::endl << s.info;
    }
 

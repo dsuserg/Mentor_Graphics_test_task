@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "functions.h"
 
 void test_functions::Checker::push_include(const std::string& include){
@@ -20,14 +21,14 @@ test_functions::Status test_functions::Checker::check(const std::filesystem::pat
     std::ifstream file{pth};
     std::string buff;
     Status status;
-    unsigned long counter{0};
-    unsigned long inc_lst_sz{ include_lst.size() };
+    size_t counter{0};
+	size_t inc_lst_sz{ include_lst.size() };
     std::vector<bool> presense(this->include_lst.size(), 0);
 
     while ( getline(file,buff) ) {
         ++counter;
 
-        for (unsigned long i{0}; i < inc_lst_sz; ++i) {
+        for (size_t i{0}; i < inc_lst_sz; ++i) {
             if ( std::regex_search(buff, std::regex{ this->include_lst[i] }) ) presense[i] = 1;
         }
 
@@ -42,7 +43,7 @@ test_functions::Status test_functions::Checker::check(const std::filesystem::pat
 
     status.success = 1;
 
-    for (unsigned long i{0}; i < inc_lst_sz; ++i) {
+    for (size_t i{0}; i < inc_lst_sz; ++i) {
         if (!presense[i]) {
             status.info += ": missing '" + this->include_lst[i] + "'\n";
             status.success &= 0;
@@ -98,8 +99,8 @@ test_functions::Status test_functions::exist(const std::filesystem::path& pth){
 test_functions::Status test_functions::same_file_set(const std::filesystem::path& pth1, const std::filesystem::path& pth2, const std::regex& re){
     Status status;
 
-    std::string dir1_name = pth1.filename();
-    std::string dir2_name = pth2.filename();
+    std::string dir1_name = pth1.filename().string();
+    std::string dir2_name = pth2.filename().string();
 
     std::set<std::string> dir1{test_functions::recursive_search_names(pth1, re)};
     std::set<std::string> dir2{test_functions::recursive_search_names(pth2, re)};

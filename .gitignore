@@ -1,3 +1,9 @@
 *.pro*
 *.o
+
 *.exe
+Debug
+Release
+x64
+.vs
+*.user
