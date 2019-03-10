@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "my_tests.h"
 
-test_functions::Status my_tests::custom_test(const std::filesystem::path &dir){
+test_functions::Status my_tests::custom_test(const std::filesystem::path &dir) {
 	char sep = dir.preferred_separator;
 	test_functions::Checker checker{};
     checker.push_include("Solver finished at");
@@ -66,11 +66,17 @@ test_functions::Status my_tests::custom_test(const std::filesystem::path &dir){
     return s;
 }
 
-test_functions::Status my_tests::custom_test_run(const std::filesystem::path& dir, const std::initializer_list<std::ostream*>& out_streams){
+test_functions::Status my_tests::custom_test_run(const std::filesystem::path& dir, const std::initializer_list<std::ostream*>& out_streams, bool create_report) {
     test_functions::Status s {my_tests::custom_test(dir)};
 
+	if (create_report) {
+		std::filesystem::path report_pth{ dir };
+		std::ofstream report{ report_pth.append("report.txt") };
+		report << s.info;
+	}
+
     for (auto *stream: out_streams) {
-        if(s.success){
+        if (s.success) {
             s.success = 1;
             *stream << "OK: " << dir.parent_path().filename().string()
                               << char(dir.preferred_separator)
