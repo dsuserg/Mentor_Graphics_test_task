@@ -1,6 +1,5 @@
 #pragma once
 
-#include "pch.h"
 #include "functions.h"
 
 namespace my_tests {

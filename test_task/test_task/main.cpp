@@ -28,6 +28,6 @@ int main(int argc, char* argv[]) {
 			my_tests::custom_test_run(dir2, { &std::cout });
         }
     }
-
+	
     return 0;
 }
