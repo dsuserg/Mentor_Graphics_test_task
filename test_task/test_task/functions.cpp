@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "functions.h"
 
-test_functions::MetaData test_functions::parse(const std::filesystem::path& path, const std::vector<std::string>& must_include, 
-	                                           const std::vector<std::regex>& must_exclude, const std::vector<std::string>& param_names) {
+test_functions::MetaData test_functions::parse(const std::filesystem::path& path,
+											   const std::vector<std::string>& must_include, const std::vector<std::regex>& must_exclude,
+											   const std::vector<std::string>& param_names, std::ostream& out) {
 	MetaData meta;
 	meta.path = path;
 	std::ifstream file{ path };
@@ -10,34 +11,34 @@ test_functions::MetaData test_functions::parse(const std::filesystem::path& path
 	size_t counter{ 0 };
 	size_t must_include_sz{ must_include.size() };
 	std::vector<bool> presense(must_include_sz, false);
-	
+	std::string path_fmt{ path.parent_path().filename().append(path.filename().string()).string() };
+
 	std::vector <std::regex> must_include_re;
-	for (const std::string &it: must_include) 
+	for (const std::string &it : must_include)
 		must_include_re.emplace_back(std::regex{ it });
-	
+
 	size_t param_names_sz{ param_names.size() };
 	std::vector <std::regex> param_names_re;
 	for (const std::string &it : param_names)
 		param_names_re.emplace_back(std::regex{ it + "\\W*(-?\\d+(?:\\.\\d+)?)" });
 
 	std::map<std::string, double> vars;
-	for (const std::string& nm: param_names) {
+	for (const std::string& nm : param_names)
 		meta.vars[nm] = std::numeric_limits<double>::min();
-	}
 
 	while (getline(file, buff)) {
 		++counter;
 
 		for (const std::regex& it : must_exclude) {
 			if (std::regex_search(buff, it)) {
-				meta.status.info << "(" << counter << "): " << buff << "\n";
+				out << path_fmt << "(" << counter << "): " << buff << "\n";
+				meta.errors = true;
 				return meta;
 			}
 		}
 
-		for (size_t i{ 0 }; i < must_include_sz; ++i) {
+		for (size_t i{ 0 }; i < must_include_sz; ++i)
 			if (std::regex_search(buff, must_include_re[i])) presense[i] = true;
-		}
 
 		std::smatch sm;
 		for (size_t i{ 0 }; i < param_names_sz; ++i) {
@@ -49,16 +50,14 @@ test_functions::MetaData test_functions::parse(const std::filesystem::path& path
 
 	}
 
-	meta.status.success = true;
-
-	for (size_t i{ 0 }; i < must_include_sz; ++i) {
-		if (!presense[i]) {
-			meta.status.info << ": missing '" << must_include[i] << "'\n";
-			meta.status.success &= 0;
+		for (size_t i{ 0 }; i < must_include_sz; ++i) {
+			if (!presense[i]) {
+				out << path_fmt << ": missing '" << must_include[i] << "'\n";
+				meta.errors |= 1;
+			}
 		}
-	}
 
-	return meta;
+		return meta;
 }
 
 
@@ -94,17 +93,13 @@ std::set<std::filesystem::path> test_functions::set_of_paths(const std::filesyst
     return  s;
 }
 
-test_functions::Status test_functions::exist(const std::filesystem::path& pth){
-    test_functions::Status status;
+bool test_functions::exist(const std::filesystem::path& pth, std::ostream& out){
+	bool succes{ std::filesystem::exists(pth) };
+    if (!succes) out << "directory missing: " << pth.filename().string() << "\n";
 
-    status.success = std::filesystem::exists(pth);
-    if (!status.success) status.info << "directory missing: " << pth.filename().string() << "\n";
-
-    return status;
+    return succes;
 }
-
-test_functions::Status test_functions::same_file_set(const std::filesystem::path& pth1, const std::filesystem::path& pth2, const std::regex& re){
-    Status status;
+bool test_functions::same_file_set(const std::filesystem::path& pth1, const std::filesystem::path& pth2, const std::regex& re, std::ostream& out){
 
     std::string dir1_name = pth1.filename().string();
     std::string dir2_name = pth2.filename().string();
@@ -119,44 +114,43 @@ test_functions::Status test_functions::same_file_set(const std::filesystem::path
     set_difference(dir2.begin(), dir2.end(), dir1.begin(), dir1.end(), inserter(d2_d1,d2_d1.end()));
 
     if ( d1_d2.empty() && d2_d1.empty() ) {
-        status.success = true;
-        return status;
+        return true;
      }
 
     else {
 
 		if (!d2_d1.empty()) {
-			status.info << "In " << dir1_name << " there are missing files present in " << dir2_name << ":";
-			for (const std::string& it : d2_d1) status.info << " '" << it << "',";
-			status.info.seekp(-1, std::ios_base::end);
-			status.info << "\n";
+			out << "In " << dir1_name << " there are missing files present in " << dir2_name << ":";
+			for (const std::string& it : d2_d1) out << " '" << it << "',";
+			out.seekp(-1, std::ios_base::end);
+			out << "\n";
 		}
 
 		if (!d1_d2.empty()) {
-			status.info << "In " << dir1_name << " there are extra files not present in " << dir2_name << ":";
-			for (const std::string& it : d1_d2) status.info << " '" << it << "',";
-			status.info.seekp(-1, std::ios_base::end);
-			status.info << "\n";
+			out << "In " << dir1_name << " there are extra files not present in " << dir2_name << ":";
+			for (const std::string& it : d1_d2) out << " '" << it << "',";
+			out.seekp(-1, std::ios_base::end);
+			out << "\n";
 		}
 
-		status.success = false;
-		return status;
+		
+		return false;
 	}
 }
 
-test_functions::Status test_functions::diff_param(MetaData& file1, const std::string& fname1, MetaData& file2, const std::string& fname2, const std::string& param_name, double criterion) {
-    Status status; 
+bool test_functions::diff_param(const std::string& fmt, MetaData& file1, const std::string& fname1, MetaData& file2, const std::string& fname2, const std::string& param_name, double criterion, std::ostream& out) { 
 
-		double f1_max{ file1.vars[param_name] };
-		double f2_max{ file2.vars[param_name] };
-		double rel_diff = static_cast<double>(std::max(f1_max, f2_max)) / std::min(f1_max, f2_max) - 1.0;
-		status.success = (rel_diff < criterion);
+	double f1_max{ file1.vars[param_name] };
+	double f2_max{ file2.vars[param_name] };
+	double rel_diff = static_cast<double>(std::max(f1_max, f2_max)) / std::min(f1_max, f2_max) - 1.0;
+	bool success = (rel_diff < criterion);
 
-		if (!status.success)
-			status.info << "(" << fname1 << "=" << f1_max << ", "
-						<< fname2 << "=" << f2_max << ", "
-						<< "rel.diff=" << std::round(rel_diff * 100) / 100 << ", "
-						<< "criterion=" << criterion << ")\n";
+	if (!success)
+		out << fmt 
+			<< "(" << fname1 << "=" << f1_max << ", "
+			<< fname2 << "=" << f2_max << ", "
+			<< "rel.diff=" << std::round(rel_diff * 100) / 100 << ", "
+			<< "criterion=" << criterion << ")\n";
 
-    return status;
+    return success;
 }
