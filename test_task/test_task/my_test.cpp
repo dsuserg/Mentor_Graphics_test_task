@@ -62,9 +62,7 @@ bool my_tests::custom_test_run(const std::filesystem::path& pth_to_test, const s
 		while (getline(ireport, buff)) {
 			std::cout << buff << std::endl;
 		}
-		while (getline(ireport, buff)) {
-			std::cout << buff << std::endl;
-		}
+		
 		return false;
 	}
 
