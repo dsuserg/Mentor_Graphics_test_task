@@ -2,12 +2,13 @@
 
 namespace test_functions {
 
+	const char SEPARATOR{ '/' };
+
 	struct MetaData {
 		bool errors{ false };
 		std::filesystem::path path;
-		std::map<std::string, double> vars;
+		std::map<std::string, std::string> vars;
 	};
-
 
     std::set<std::string> recursive_search_names(const std::filesystem::path&, const std::regex& = std::regex{ "\\w" });
     std::set<std::filesystem::path> recursive_search_paths(const std::filesystem::path&, const std::regex& = std::regex{ "\\w" });

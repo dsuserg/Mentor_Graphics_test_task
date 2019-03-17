@@ -11,7 +11,7 @@ test_functions::MetaData test_functions::parse(const std::filesystem::path& path
 	size_t counter{ 0 };
 	size_t must_include_sz{ must_include.size() };
 	std::vector<bool> presense(must_include_sz, false);
-	std::string path_fmt{ path.parent_path().filename().append(path.filename().string()).string() };
+	std::string path_fmt{ path.parent_path().filename().string() + test_functions::SEPARATOR + path.filename().string() };
 
 	std::vector <std::regex> must_include_re;
 	for (const std::string &it : must_include)
@@ -22,9 +22,8 @@ test_functions::MetaData test_functions::parse(const std::filesystem::path& path
 	for (const std::string &it : param_names)
 		param_names_re.emplace_back(std::regex{ it + "\\W*(-?\\d+(?:\\.\\d+)?)" });
 
-	std::map<std::string, double> vars;
 	for (const std::string& nm : param_names)
-		meta.vars[nm] = std::numeric_limits<double>::min();
+		meta.vars[nm] = std::to_string( std::numeric_limits<double>::min() );
 
 	while (getline(file, buff)) {
 		++counter;
@@ -43,8 +42,9 @@ test_functions::MetaData test_functions::parse(const std::filesystem::path& path
 		std::smatch sm;
 		for (size_t i{ 0 }; i < param_names_sz; ++i) {
 			if (regex_search(buff, sm, param_names_re[i])) {
-				double tmp{ stod(sm[1]) };
-				meta.vars[param_names[i]] = std::max(tmp, vars[param_names[i]]);
+				
+				if ( std::stod( sm[1] ) > std::stod( meta.vars[param_names[i]] ))
+					meta.vars[param_names[i]] = sm[1];
 			}
 		}
 
@@ -113,6 +113,10 @@ bool test_functions::same_file_set(const std::filesystem::path& pth1, const std:
     set_difference(dir1.begin(), dir1.end(), dir2.begin(), dir2.end(), inserter(d1_d2,d1_d2.end()));
     set_difference(dir2.begin(), dir2.end(), dir1.begin(), dir1.end(), inserter(d2_d1,d2_d1.end()));
 
+	std::string my_sep{ test_functions::SEPARATOR };
+	std::string sys_sep{ char(std::filesystem::path::preferred_separator) == '/' ? "/" : "\\\\" };
+	std::regex re_sep{sys_sep};
+
     if ( d1_d2.empty() && d2_d1.empty() ) {
         return true;
      }
@@ -121,14 +125,14 @@ bool test_functions::same_file_set(const std::filesystem::path& pth1, const std:
 
 		if (!d2_d1.empty()) {
 			out << "In " << dir1_name << " there are missing files present in " << dir2_name << ":";
-			for (const std::string& it : d2_d1) out << " '" << it << "',";
+			for (const std::string& it : d2_d1) out << " '" << std::regex_replace(it, re_sep, my_sep ) << "',";
 			out.seekp(-1, std::ios_base::end);
 			out << "\n";
 		}
 
 		if (!d1_d2.empty()) {
-			out << "In " << dir1_name << " there are extra files not present in " << dir2_name << ":";
-			for (const std::string& it : d1_d2) out << " '" << it << "',";
+			out << "In " << dir1_name << " there are extra files files not present in " << dir2_name << ":";
+			for (const std::string& it : d1_d2) out << " '" << std::regex_replace(it, re_sep, my_sep) << "',";
 			out.seekp(-1, std::ios_base::end);
 			out << "\n";
 		}
@@ -140,16 +144,18 @@ bool test_functions::same_file_set(const std::filesystem::path& pth1, const std:
 
 bool test_functions::diff_param(const std::string& fmt, MetaData& file1, const std::string& fname1, MetaData& file2, const std::string& fname2, const std::string& param_name, double criterion, std::ostream& out) { 
 
-	double f1_max{ file1.vars[param_name] };
-	double f2_max{ file2.vars[param_name] };
+	double f1_max{ std::stod(file1.vars[param_name]) };
+	double f2_max{ std::stod(file2.vars[param_name]) };
 	double rel_diff = static_cast<double>(std::max(f1_max, f2_max)) / std::min(f1_max, f2_max) - 1.0;
 	bool success = (rel_diff < criterion);
+	std::stringstream rel_diff_fmt;
+	rel_diff_fmt << std::fixed << std::setprecision(2) << rel_diff;
 
 	if (!success)
 		out << fmt 
-			<< "(" << fname1 << "=" << f1_max << ", "
-			<< fname2 << "=" << f2_max << ", "
-			<< "rel.diff=" << std::round(rel_diff * 100) / 100 << ", "
+			<< "(" << fname1 << "=" << file1.vars[param_name] << ", "
+			<< fname2 << "=" << file2.vars[param_name] << ", "
+			<< "rel.diff=" << rel_diff_fmt.str() << ", "
 			<< "criterion=" << criterion << ")\n";
 
     return success;

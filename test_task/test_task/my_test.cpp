@@ -8,9 +8,8 @@ bool my_tests::custom_test(const std::filesystem::path &dir, std::ostream& out) 
 	std::vector<std::string> param_names{ { std::string("Memory Working Set Peak"), std::string("MESH::Bricks: Total")} };
 	bool success{ true };
 
-	char sep = dir.preferred_separator;
-    std::string pth_ft_run { dir.string()+sep+"ft_run" };
-    std::string pth_ft_reference { dir.string()+sep+"ft_reference" };
+    std::string pth_ft_run { dir.string() + test_functions::SEPARATOR + "ft_run" };
+    std::string pth_ft_reference { dir.string()+ test_functions::SEPARATOR +"ft_reference" };
 
     if ( !test_functions::exist( pth_ft_run, out) ) return false;
     if ( !test_functions::exist( pth_ft_reference, out) ) return false;
@@ -31,7 +30,7 @@ bool my_tests::custom_test(const std::filesystem::path &dir, std::ostream& out) 
 
 		test_functions::MetaData meta2{ test_functions::parse(*pth2, must_include, must_exclude, param_names, out) };
 
-		std::string fmt{ pth1->parent_path().filename().append(pth1->filename().string()).string()  };
+		std::string fmt{ pth1->parent_path().filename().string() + test_functions::SEPARATOR + pth1->filename().string() };
 		if (!test_functions::diff_param( fmt + ": different 'Memory Working Set Peak' ",
 										 meta1, "ft_run", meta2, "ft_reference", 
 										 "Memory Working Set Peak", 4, out ) ) success &= 0;
@@ -46,19 +45,21 @@ bool my_tests::custom_test(const std::filesystem::path &dir, std::ostream& out) 
     return success;
 }
 
-bool my_tests::custom_test_run(const std::filesystem::path& pth_to_test, const std::filesystem::path& dir) {
-	std::filesystem::path report_pth{ std::filesystem::path {dir}.append("report.txt") };
+bool my_tests::custom_test_run(const std::filesystem::path& pth_to_test) {
+	std::string formatted_pth{ pth_to_test.parent_path().filename().string() + test_functions::SEPARATOR
+							   + pth_to_test.filename().string() + test_functions::SEPARATOR };
+	std::filesystem::path report_pth{ std::filesystem::path {pth_to_test}.append("report.txt") };
 	std::ofstream oreport{ report_pth };
-	bool success{ custom_test(dir, oreport) };
+	bool success{ custom_test(pth_to_test, oreport) };
 	oreport.close();
 	if (success) {
-			std::cout << "OK: " << dir.lexically_relative(pth_to_test).string()  << std::endl;
+			std::cout << "OK: " << formatted_pth << std::endl;
 			return true;
 	} 
 	else {
 		std::ifstream ireport{ report_pth };
 		std::string buff;
-		std::cout << "FAIL: " << dir.lexically_relative(pth_to_test).string() << std::endl;
+		std::cout << "FAIL: " << formatted_pth << std::endl;
 		while (getline(ireport, buff)) {
 			std::cout << buff << std::endl;
 		}

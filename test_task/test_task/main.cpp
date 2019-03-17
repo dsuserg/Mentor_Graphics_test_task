@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     for(auto& dir1 : dirs_level_1){
         std::set<std::filesystem::path> dirs_level_2{test_functions::set_of_paths(dir1)};
         for(auto& dir2 : dirs_level_2){
-			my_tests::custom_test_run(pth,dir2);
+			my_tests::custom_test_run(dir2);
         }
     }
 	
